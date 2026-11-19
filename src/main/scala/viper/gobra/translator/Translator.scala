@@ -13,7 +13,7 @@ import viper.gobra.frontend.{Config, Hyper, PackageInfo}
 import viper.gobra.reporting.{ConsistencyError, GeneratedViperMessage, TransformerFailureMessage, VerifierError}
 import viper.gobra.translator.context.DfltTranslatorConfig
 import viper.gobra.translator.encodings.programs.ProgramsImpl
-import viper.gobra.translator.transformers.hyper.SIFLowGuardTransformerImpl
+import viper.gobra.translator.transformers.hyper.{SIFExtendedHyperfuncTransformerImpl, SIFLowGuardTransformerImpl}
 import viper.gobra.translator.transformers.{AssumeTransformer, TerminationDomainTransformer, ViperTransformer}
 import viper.gobra.util.Violation
 import viper.silver.ast.{AbstractSourcePosition, SourcePosition}
@@ -39,7 +39,8 @@ object Translator {
 
     // for hyper mode `EnabledExtended`, we use Viper's SIF plugin instead
     val sifTransformer =
-      if (config.hyperModeOrDefault == Hyper.EnabledExtended) Seq.empty
+      // (hyperfuncs are removed before, since the plugin does not support relational functions)
+      if (config.hyperModeOrDefault == Hyper.EnabledExtended) Seq(new SIFExtendedHyperfuncTransformerImpl(config))
       else Seq(new SIFLowGuardTransformerImpl(config))
     val transformers: Seq[ViperTransformer] = Seq(
       new AssumeTransformer,
@@ -51,14 +52,12 @@ object Translator {
       case (errs, _) => errs
     }
 
+    // the generated program must be consistent; errors reported by the transformers above are user errors instead
     if (config.checkConsistency) {
-      transformedTask
-        .flatMap(task => {
-          val consistencyErrs = task.program.checkTransitively
-          if (consistencyErrs.isEmpty) Right(())
-          else Left(createConsistencyErrors(consistencyErrs))
-        })
-        .left.map(errs => Violation.violation(errs.toString))
+      transformedTask.foreach(task => {
+        val consistencyErrs = task.program.checkTransitively
+        if (consistencyErrs.nonEmpty) Violation.violation(createConsistencyErrors(consistencyErrs).toString)
+      })
     }
 
     val inputs = config.packageInfoInputMap(pkgInfo).map(_.name)

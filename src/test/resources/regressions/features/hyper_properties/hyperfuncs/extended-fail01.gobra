@@ -1,0 +1,35 @@
+// Any copyright is dedicated to the Public Domain.
+// http://creativecommons.org/publicdomain/zero/1.0/
+
+// ##(--hyperMode extended --experimentalHyperfuncs)
+
+package extendedfail01
+
+// In the extended encoding, hyperfuncs that read the heap are inlined, so they must be non-recursive and have a body.
+
+pred list(l *node) { acc(l) && (l.next != nil ==> list(l.next)) }
+
+type node struct {
+	val int
+	next *node
+}
+
+//:: ExpectedOutput(consistency_error)
+requires list(l)
+decreases list(l)
+hyperfunc LowList(l *node) bool {
+	return unfolding list(l) in low(l.val) && (l.next != nil ==> LowList(l.next))
+}
+
+//:: ExpectedOutput(consistency_error)
+requires acc(p)
+decreases
+hyperfunc LowAt(p *int) bool
+
+requires list(l) && LowList(l)
+ensures  list(l)
+func UseList(l *node) {}
+
+requires acc(p) && LowAt(p)
+ensures  acc(p)
+func UseAt(p *int) {}

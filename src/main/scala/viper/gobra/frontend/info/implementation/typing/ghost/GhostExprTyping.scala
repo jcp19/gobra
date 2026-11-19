@@ -140,7 +140,7 @@ trait GhostExprTyping extends BaseTyping { this: TypeInfoImpl =>
       }
       isExpr(e).out ++
       error(n, s"rel expressions are currently only supported if hyperMode '${Hyper.Enabled.name}' is used, or if hyperMode '${Hyper.EnabledExtended.name}' and the '${Config.enableExperimentalHyperFeaturesOptionName}' flag are used.",
-        config.hyperModeOrDefault == Hyper.EnabledExtended && !config.enableExperimentalHyperFeatures) ++
+        config.hyperModeOrDefault == Hyper.EnabledExtended && !config.enableExperimentalHyperFeatures && !isInHyperfunc(n) && !isInHyperfuncAtom(n)) ++
       indexMessages ++ relationalPositionMessages(n)
 
     case n: PGhostEquals =>
@@ -260,6 +260,32 @@ trait GhostExprTyping extends BaseTyping { this: TypeInfoImpl =>
       case PWildcardPerm() => noMessages
       case PNoPerm() => noMessages
     }
+  }
+
+  /**
+    * Whether `n` occurs in the body or contract of a hyperfunc. In hyperMode extended, Gobra translates hyperfuncs
+    * itself, so `rel` is supported there without the experimental flag of Viper's SIF plugin.
+    */
+  private[typing] def isInHyperfunc(n: PNode): Boolean = tree.parent(n).headOption match {
+    case Some(f: PFunctionDecl) => f.spec.isHyper
+    case Some(m: PMethodDecl) => m.spec.isHyper
+    case Some(m: PMethodSig) => m.spec.isHyper
+    case Some(p) => isInHyperfunc(p)
+    case None => false
+  }
+
+  /**
+    * Whether `n` occurs in an atomic assertion (not separated by `&&`, `==>`, quantifiers, `old` or `unfolding`) that
+    * contains a call to a hyperfunc. In hyperMode extended, Gobra translates such atoms itself.
+    */
+  private[typing] def isInHyperfuncAtom(n: PNode): Boolean = {
+    def atomRoot(e: PNode): PNode = tree.parent(e).headOption match {
+      case Some(_: PAnd | _: PImplication | _: PForall | _: PExists | _: POld | _: PLabeledOld | _: PUnfolding) => e
+      case Some(p: PExpression) => atomRoot(p)
+      case _ => e
+    }
+    val root = atomRoot(n)
+    (root +: allChildren(root)).exists { case inv: PInvoke => isHyperCall(inv); case _ => false }
   }
 
   /** Returns whether `n` is a call to a hyper function or a hyper method, i.e., to a hyperfunc. */
