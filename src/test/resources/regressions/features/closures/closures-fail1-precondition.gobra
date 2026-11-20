@@ -84,6 +84,7 @@ func test6() {
 }
 
 ensures res >= 0
+decreases
 pure func pspec()(res int)
 
 func test7() {

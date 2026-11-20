@@ -6,6 +6,7 @@ package closuresFail6Proofs
 ghost
 requires x >= 0
 ensures y == x
+decreases
 pure func pspec(x int) (y int)
 
 func test1() {
@@ -44,6 +45,7 @@ pred inv1(x *int) {
 
 ghost
 requires inv(n) && unfolding inv(n) in (*n >= 0)
+decreases
 pure func permpspec(n *int) (y int)
 
 func test3() {
@@ -79,6 +81,7 @@ func test4() {
 ghost
 requires x >= 0
 ensures y == x + 2
+decreases
 func spec(x int) (y int)
 
 func test5() {
@@ -133,6 +136,7 @@ func test7() {
 ghost
 requires inv(n) && unfolding inv(n) in (*n >= 0)
 ensures inv1(n)
+decreases
 func permspec(n *int) (y int)
 
 func test8() {

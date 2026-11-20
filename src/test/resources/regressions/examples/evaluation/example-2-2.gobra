@@ -21,6 +21,7 @@ type stream interface {
 type counter struct{ f, max int }
 
 requires acc(x, 1/2)
+decreases
 pure func (x *counter) hasNext() bool {
   return x.f < x.max
 }

@@ -15,6 +15,7 @@ type ImplT struct{}
 //:: ExpectedOutput(type_error)
 pure
 ensures n >= 0
+decreases
 func (i ImplT) f() (n int) {
 	return 0
 }

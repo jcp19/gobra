@@ -39,6 +39,7 @@ pred testP(x *counter, i int) {
 type counter struct{ f, max int }
 
 requires acc(x, 1/2)
+decreases
 pure func (x *counter) hasNext() bool {
   return x.f < x.max
 }

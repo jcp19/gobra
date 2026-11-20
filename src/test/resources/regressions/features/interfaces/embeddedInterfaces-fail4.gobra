@@ -19,6 +19,7 @@ type test int
 func (x test) f()
 
 ensures res == 5
+decreases
 pure func (x test) g() (res int)
 
 test implements foo

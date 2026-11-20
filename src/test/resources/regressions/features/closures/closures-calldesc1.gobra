@@ -22,6 +22,7 @@ ghost
 requires x >= 0 && cs != nil && cs.inv()
 ensures cs.inv() && cs.called(x) && cs.res(x, res)
 ensures forall x int :: old(cs.called(x)) ==> cs.called(x)
+decreases
 func spec(ghost cs Calls, x int) (res int)
 
 requires f implements spec{cs}
@@ -41,10 +42,12 @@ type Acc struct { accum *int }
 pred (self Acc) inv() { acc(self.accum) && *self.accum >= 0 }
 ghost
 requires self.inv()
+decreases
 pure func (self Acc) called(x int)bool {
     return unfolding self.inv() in (*self.accum >= x)
 }
 ghost
+decreases
 pure func (self Acc) res(x int, y int)bool {
     return y >= x
 }

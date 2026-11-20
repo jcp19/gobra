@@ -5,6 +5,7 @@ package closuresFail5Proofs
 
 ghost
 requires x >= 0
+decreases
 pure func pspec(x int) (y int)
 
 func test1() {
@@ -93,6 +94,7 @@ func test5() {
 
 ghost
 requires x >= 0
+decreases
 func spec(x int) (y int)
 
 func test6() {

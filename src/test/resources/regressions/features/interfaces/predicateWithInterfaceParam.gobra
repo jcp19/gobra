@@ -9,6 +9,7 @@ type AnInterface interface {
 
 type AnImplementation struct {}
 
+decreases
 pure func (impl *AnImplementation) getVal() int {
     return 42
 }

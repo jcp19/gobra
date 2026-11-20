@@ -35,6 +35,7 @@ pred (s *S) m() {
 
 //:: ExpectedOutput(generated_implementation_proof:postcondition_error)
 requires acc(s.m(), _)
+decreases
 pure func (s *S) g() int {
     return unfolding acc(s.m(), _) in s.x
 }

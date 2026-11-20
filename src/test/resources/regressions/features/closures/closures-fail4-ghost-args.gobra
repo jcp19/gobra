@@ -4,6 +4,7 @@
 package closuresFail4GhostArgs
 
 ghost
+decreases
 func spec(a int, ghost b int)(c int, ghost d int)
 
 func test1() {

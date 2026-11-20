@@ -22,6 +22,7 @@ func test1() {
     assert pos implements generic
 }
 
+decreases
 pure func pureGeneric(a int)int
 
 decreases
@@ -62,6 +63,7 @@ type I interface {
 }
 
 type S struct {}
+decreases
 pure func (self S) res(int)int {
     return 10
 }

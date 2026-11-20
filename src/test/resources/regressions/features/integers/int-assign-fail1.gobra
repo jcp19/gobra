@@ -7,7 +7,8 @@ package ints
 // of type (ghost) func(), but currently is an error because built-in members can't be
 // overridden
 //:: ExpectedOutput(type_error)
-ghost pure func int64(x int32) int64
+ghost decreases
+pure func int64(x int32) int64
 
 func wrongAssign1(x int32) (ret int64) {
 	//:: ExpectedOutput(type_error)
