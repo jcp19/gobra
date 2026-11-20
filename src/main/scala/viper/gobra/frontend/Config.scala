@@ -76,7 +76,6 @@ object ConfigDefaults {
   val DefaultParseAndTypeCheckMode: TaskManagerMode = TaskManagerMode.Parallel
   val DefaultRequireTriggers: Boolean = false
   val DefaultDisableSetAxiomatization: Boolean = false
-  val DefaultDisableCheckTerminationPureFns: Boolean = false
   val DefaultUnsafeWildcardOptimization: Boolean = false
   val DefaultMoreJoins: MoreJoins.Mode = MoreJoins.Disabled
   val DefaultRespectFunctionPrePermAmounts: Boolean = false
@@ -187,7 +186,6 @@ case class Config(
                    // when enabled, all quantifiers without triggers are rejected
                    requireTriggers: Boolean = ConfigDefaults.DefaultRequireTriggers,
                    disableSetAxiomatization: Boolean = ConfigDefaults.DefaultDisableSetAxiomatization,
-                   disableCheckTerminationPureFns: Boolean = ConfigDefaults.DefaultDisableCheckTerminationPureFns,
                    unsafeWildcardOptimization: Boolean = ConfigDefaults.DefaultUnsafeWildcardOptimization,
                    moreJoins: MoreJoins.Mode = ConfigDefaults.DefaultMoreJoins,
                    respectFunctionPrePermAmounts: Boolean = ConfigDefaults.DefaultRespectFunctionPrePermAmounts,
@@ -316,7 +314,6 @@ case class BaseConfig(gobraDirectory: Option[Path] = ConfigDefaults.DefaultGobra
                       parseAndTypeCheckMode: TaskManagerMode = ConfigDefaults.DefaultParseAndTypeCheckMode,
                       requireTriggers: Boolean = ConfigDefaults.DefaultRequireTriggers,
                       disableSetAxiomatization: Boolean = ConfigDefaults.DefaultDisableSetAxiomatization,
-                      disableCheckTerminationPureFns: Boolean = ConfigDefaults.DefaultDisableCheckTerminationPureFns,
                       unsafeWildcardOptimization: Boolean = ConfigDefaults.DefaultUnsafeWildcardOptimization,
                       moreJoins: MoreJoins.Mode = ConfigDefaults.DefaultMoreJoins,
                       respectFunctionPrePermAmounts: Boolean = ConfigDefaults.DefaultRespectFunctionPrePermAmounts,
@@ -870,13 +867,6 @@ class ScallopGobraConfig(arguments: Seq[String], isInputOptional: Boolean = fals
     name = "noStreamErrors",
     descr = s"Do not stream errors produced by ${GoVerifier.name} but instead print them all organized by package in the end.",
     default = Some(ConfigDefaults.DefaultNoStreamErrors),
-    noshort = true,
-  )
-
-  val disableCheckTerminationPureFns: ScallopOption[Boolean] = opt[Boolean](
-    name = "disablePureFunctsTerminationRequirement",
-    descr = "Do not enforce that all pure functions must have termination measures",
-    default = Some(ConfigDefaults.DefaultDisableCheckTerminationPureFns),
     noshort = true,
   )
 
